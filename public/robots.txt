@@ -1,0 +1,42 @@
+User-agent: *
+Allow: /
+
+# Allow important pages
+Allow: /courses
+Allow: /blog
+Allow: /services
+Allow: /about
+Allow: /contact
+Allow: /pricing
+
+# Disallow admin and private areas
+Disallow: /admin/
+Disallow: /dashboard/
+Disallow: /api/
+Disallow: /auth/
+Disallow: /profile/
+Disallow: /*?*utm_*
+Disallow: /*?*ref=*
+
+# Disallow search and filter URLs to avoid duplicate content
+Disallow: /courses?*
+Disallow: /blog?*
+Disallow: /services?*
+
+# Allow crawling of static assets
+Allow: /images/
+Allow: /assets/
+Allow: /*.css
+Allow: /*.js
+Allow: /*.png
+Allow: /*.jpg
+Allow: /*.jpeg
+Allow: /*.gif
+Allow: /*.webp
+Allow: /*.svg
+
+# Sitemap location
+Sitemap: https://tekpounou.com/sitemap.xml
+
+# Crawl delay for politeness
+Crawl-delay: 1
