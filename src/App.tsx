@@ -6,8 +6,8 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 
 // Providers
-import { SupabaseProvider } from './components/providers/SupabaseProvider'
-import { AuthProvider } from './components/providers/AuthProvider'
+import SupabaseProvider from './components/providers/SupabaseProvider'
+import AuthProvider from './components/providers/AuthProvider'
 
 // Components
 import { SEOHead, defaultSEOConfigs } from './components/common/SEOHead'
@@ -36,7 +36,7 @@ import NewsletterUnsubscribePage from './pages/NewsletterUnsubscribePage'
 import NotFoundPage from './pages/NotFoundPage'
 
 // Admin Components
-import { AdminLayout } from './components/admin/AdminLayout'
+import AdminLayout from './components/admin/AdminLayout'
 import { MarketingDashboard } from './components/admin/MarketingDashboard'
 import { LandingPageBuilder } from './components/admin/LandingPageBuilder'
 
