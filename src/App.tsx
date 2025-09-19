@@ -6,7 +6,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 
 // Providers
-import SupabaseProvider from './components/providers/SupabaseProvider.tsx'
+import SupabaseProvider from '@/components/providers/SupabaseProvider'
 import AuthProvider from './components/providers/AuthProvider'
 
 // Components
