@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -8,15 +8,15 @@ import {
   EnvelopeIcon,
   UserGroupIcon,
   CurrencyDollarIcon,
-  ShareIcon,
   CheckCircleIcon
 } from '@heroicons/react/24/outline'
 import { CopyToClipboard } from 'react-copy-to-clipboard'
 import { toast } from 'react-hot-toast'
 import { motion } from 'framer-motion'
-import { useSupabaseClient } from '../providers/SupabaseProvider'
-import { useAuthStore } from '../stores/authStore'
+import { useSupabaseClient } from '@supabase/auth-helpers-react'
+import { useAuthStore } from '@/stores/authStore'
 import { SocialShare } from '../common/SocialShare'
+
 
 const referralSchema = z.object({
   email: z.string().email('Email la pa valab. Email is not valid.')

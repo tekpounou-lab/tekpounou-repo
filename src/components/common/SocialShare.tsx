@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { 
   FacebookShareButton, 
   TwitterShareButton, 
@@ -16,8 +16,8 @@ import {
 import { CopyToClipboard } from 'react-copy-to-clipboard'
 import { LinkIcon, CheckIcon } from '@heroicons/react/24/outline'
 import { toast } from 'react-hot-toast'
-import { useSupabaseClient } from '../providers/SupabaseProvider'
-import { useAuthStore } from '../stores/authStore'
+import { useSupabaseClient } from '@supabase/auth-helpers-react'
+import { useAuthStore } from '@/stores/authStore'
 
 interface SocialShareProps {
   url: string

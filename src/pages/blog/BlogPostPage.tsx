@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
 import { Calendar, Eye, Heart, Tag, ArrowLeft, Share2 } from 'lucide-react';
-import { useAuth } from '../../contexts/AuthContext';
+import { useAuth } from '@/hooks/useAuth';;
 
 interface BlogPost {
   id: string;
@@ -102,7 +102,7 @@ const BlogPostPage: React.FC = () => {
     if (!user || !post) return;
 
     try {
-      const { data, error } = await supabase
+      const { data} = await supabase
         .from('blog_post_likes')
         .select('id')
         .eq('user_id', user.id)

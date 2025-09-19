@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../..
 import { Button } from '../../components/ui/Button'
 import { Badge } from '../../components/ui/Badge'
 import { Input } from '../../components/ui/Input'
-import { Textarea } from '../../components/ui/Textarea'
+import { Textarea } from '../../components/ui/textarea'
 import { Label } from '../../components/ui/Label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../components/ui/Select'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '../../components/ui/Dialog'

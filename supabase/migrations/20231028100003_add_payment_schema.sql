@@ -28,7 +28,7 @@ CREATE TABLE user_subscriptions (
     stripe_subscription_id VARCHAR(255),
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW(),
-    UNIQUE(user_id, plan_id, status) -- Prevent duplicate active subscriptions
+    UNIQUE(user_id, plan_id, status)
 );
 
 -- Transactions Table
@@ -57,13 +57,13 @@ CREATE TABLE teacher_earnings (
     gross_amount DECIMAL(10, 2) NOT NULL,
     platform_fee DECIMAL(10, 2) NOT NULL,
     net_amount DECIMAL(10, 2) NOT NULL,
-    commission_rate DECIMAL(5, 2) NOT NULL DEFAULT 30.00, -- Platform commission percentage
+    commission_rate DECIMAL(5, 2) NOT NULL DEFAULT 30.00,
     status VARCHAR(20) NOT NULL CHECK (status IN ('pending', 'available', 'paid', 'hold')),
     payout_date TIMESTAMPTZ,
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- Platform Settings Table (for commission rates, etc.)
+-- Platform Settings Table
 CREATE TABLE platform_settings (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     key VARCHAR(100) NOT NULL UNIQUE,
@@ -78,7 +78,7 @@ ALTER TABLE courses ADD COLUMN IF NOT EXISTS price DECIMAL(10, 2) DEFAULT 0.00;
 ALTER TABLE courses ADD COLUMN IF NOT EXISTS currency VARCHAR(3) DEFAULT 'USD';
 ALTER TABLE courses ADD COLUMN IF NOT EXISTS is_premium BOOLEAN DEFAULT false;
 
--- Create indexes for better performance
+-- Create indexes
 CREATE INDEX idx_user_subscriptions_user_id ON user_subscriptions(user_id);
 CREATE INDEX idx_user_subscriptions_status ON user_subscriptions(status);
 CREATE INDEX idx_transactions_user_id ON transactions(user_id);
@@ -126,14 +126,16 @@ INSERT INTO platform_settings (key, value, description) VALUES
 ('supported_currencies', '["USD", "EUR", "HTG"]', 'List of supported currencies'),
 ('payment_providers', '["stripe", "moncash", "cam_transfer"]', 'Available payment providers');
 
--- Row Level Security (RLS) Policies
+-- Enable Row Level Security
 ALTER TABLE subscription_plans ENABLE ROW LEVEL SECURITY;
 ALTER TABLE user_subscriptions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE transactions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE teacher_earnings ENABLE ROW LEVEL SECURITY;
 ALTER TABLE platform_settings ENABLE ROW LEVEL SECURITY;
 
--- Subscription plans - readable by all, writable by admins
+-- Policies
+
+-- Subscription plans
 CREATE POLICY "Subscription plans are viewable by everyone" ON subscription_plans
     FOR SELECT USING (is_active = true);
 
@@ -141,12 +143,12 @@ CREATE POLICY "Subscription plans are manageable by admins" ON subscription_plan
     FOR ALL USING (
         EXISTS (
             SELECT 1 FROM profiles 
-            WHERE profiles.id = auth.uid() 
-            AND profiles.role IN ('admin', 'super_admin')
+            WHERE profiles.id = auth.uid()
+            AND profiles.roles = ANY('{admin,super_admin}'::text[])
         )
     );
 
--- User subscriptions - users can see their own, admins can see all
+-- User subscriptions
 CREATE POLICY "Users can view their own subscriptions" ON user_subscriptions
     FOR SELECT USING (auth.uid() = user_id);
 
@@ -157,12 +159,12 @@ CREATE POLICY "Admins can manage all subscriptions" ON user_subscriptions
     FOR ALL USING (
         EXISTS (
             SELECT 1 FROM profiles 
-            WHERE profiles.id = auth.uid() 
-            AND profiles.role IN ('admin', 'super_admin')
+            WHERE profiles.id = auth.uid()
+            AND profiles.roles = ANY('{admin,super_admin}'::text[])
         )
     );
 
--- Transactions - users can see their own, admins can see all
+-- Transactions
 CREATE POLICY "Users can view their own transactions" ON transactions
     FOR SELECT USING (auth.uid() = user_id);
 
@@ -173,12 +175,12 @@ CREATE POLICY "Admins can manage all transactions" ON transactions
     FOR ALL USING (
         EXISTS (
             SELECT 1 FROM profiles 
-            WHERE profiles.id = auth.uid() 
-            AND profiles.role IN ('admin', 'super_admin')
+            WHERE profiles.id = auth.uid()
+            AND profiles.roles = ANY('{admin,super_admin}'::text[])
         )
     );
 
--- Teacher earnings - teachers can see their own, admins can see all
+-- Teacher earnings
 CREATE POLICY "Teachers can view their own earnings" ON teacher_earnings
     FOR SELECT USING (auth.uid() = teacher_id);
 
@@ -186,12 +188,12 @@ CREATE POLICY "Admins can manage all earnings" ON teacher_earnings
     FOR ALL USING (
         EXISTS (
             SELECT 1 FROM profiles 
-            WHERE profiles.id = auth.uid() 
-            AND profiles.role IN ('admin', 'super_admin')
+            WHERE profiles.id = auth.uid()
+            AND profiles.roles = ANY('{admin,super_admin}'::text[])
         )
     );
 
--- Platform settings - readable by authenticated users, writable by super admins
+-- Platform settings
 CREATE POLICY "Platform settings are viewable by authenticated users" ON platform_settings
     FOR SELECT USING (auth.role() = 'authenticated');
 
@@ -199,8 +201,8 @@ CREATE POLICY "Platform settings are manageable by super admins" ON platform_set
     FOR ALL USING (
         EXISTS (
             SELECT 1 FROM profiles 
-            WHERE profiles.id = auth.uid() 
-            AND profiles.role = 'super_admin'
+            WHERE profiles.id = auth.uid()
+            AND profiles.roles = ANY('{super_admin}'::text[])
         )
     );
 
@@ -211,9 +213,9 @@ BEGIN
     NEW.updated_at = NOW();
     RETURN NEW;
 END;
-$$ language 'plpgsql';
+$$ LANGUAGE plpgsql;
 
--- Triggers for automatic timestamp updates
+-- Triggers
 CREATE TRIGGER update_subscription_plans_updated_at BEFORE UPDATE ON subscription_plans
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 

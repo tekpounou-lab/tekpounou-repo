@@ -4,8 +4,8 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { EnvelopeIcon, CheckCircleIcon } from '@heroicons/react/24/outline'
 import { toast } from 'react-hot-toast'
-import { useSupabaseClient } from '../providers/SupabaseProvider'
-import { useAuthStore } from '../stores/authStore'
+import { useSupabaseClient } from '@supabase/auth-helpers-react'
+import { useAuthStore } from '@/stores/authStore'
 import { motion, AnimatePresence } from 'framer-motion'
 
 const newsletterSchema = z.object({

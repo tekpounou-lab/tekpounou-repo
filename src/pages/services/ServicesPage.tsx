@@ -10,7 +10,7 @@ import { Input } from '../../components/ui/Input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../components/ui/Select'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '../../components/ui/Dialog'
 import { Label } from '../../components/ui/Label'
-import { Textarea } from '../../components/ui/Textarea'
+import { Textarea } from '../../components/ui/textarea'
 import { Search, Filter, ExternalLink, Clock, DollarSign, Tag } from 'lucide-react'
 
 interface Service {
