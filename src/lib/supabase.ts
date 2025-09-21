@@ -1,17 +1,22 @@
 import { createClient } from '@supabase/supabase-js';
 import { env, validateEnv } from './config';
 
-// Validate environment variables
-validateEnv();
+// Validate environment variables and create client conditionally
+const isValidEnv = validateEnv();
 
 // Create Supabase client
-export const supabase = createClient(env.SUPABASE_URL, env.SUPABASE_ANON_KEY, {
-  auth: {
-    autoRefreshToken: true,
-    persistSession: true,
-    detectSessionInUrl: true,
-  },
-});
+export const supabase = isValidEnv 
+  ? createClient(env.SUPABASE_URL, env.SUPABASE_ANON_KEY, {
+      auth: {
+        autoRefreshToken: true,
+        persistSession: true,
+        detectSessionInUrl: true,
+      },
+    })
+  : null;
+
+// Helper to check if Supabase is available
+export const isSupabaseAvailable = () => supabase !== null;
 
 // Database table types for better TypeScript support
 export type Database = {
