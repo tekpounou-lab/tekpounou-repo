@@ -5,7 +5,6 @@ let stripePromise: Promise<Stripe | null>;
 const getStripe = () => {
   if (!stripePromise) {
     stripePromise = loadStripe(
-      process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || 
       import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || 
       ''
     );
@@ -16,8 +15,7 @@ const getStripe = () => {
 export default getStripe;
 
 export const STRIPE_CONFIG = {
-  publishableKey: process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || 
-                  import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || '',
+  publishableKey: import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || '',
   
   // Payment method types to accept
   paymentMethodTypes: ['card', 'bancontact', 'ideal'] as const,
