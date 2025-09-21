@@ -13,7 +13,8 @@ import {
   CursorArrowRaysIcon
 } from '@heroicons/react/24/outline'
 import { toast } from 'react-hot-toast'
-import { motion, DragDropContext, Droppable, Draggable } from 'framer-motion'
+import { motion } from 'framer-motion'
+import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd'
 import { useSupabaseClient } from '@supabase/auth-helpers-react'
 import { useAuthStore } from '@/stores/authStore'
 import { SEOHead, structuredDataGenerators } from '../common/SEOHead'
