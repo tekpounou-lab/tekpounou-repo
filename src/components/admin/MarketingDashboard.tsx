@@ -13,7 +13,7 @@ import {
 } from '@heroicons/react/24/outline'
 import { LineChart, Line, AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts'
 import { motion } from 'framer-motion'
-import { useSupabaseClient } from '../providers/AuthProvider'
+import { useSupabaseClient } from '@supabase/auth-helpers-react'
 import { toast } from 'react-hot-toast'
 
 interface MarketingStats {

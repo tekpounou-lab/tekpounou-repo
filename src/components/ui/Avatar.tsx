@@ -1,25 +1,13 @@
-// src/components/ui/Avatar.tsx
-import React from "react";
-import { cn } from "@/utils";
+import * as React from "react"
 
-interface AvatarProps extends React.HTMLAttributes<HTMLDivElement> {
-  src?: string;
-  alt?: string;
+export function Avatar({ children, ...props }: React.HTMLAttributes<HTMLDivElement>) {
+  return <div className="relative flex h-10 w-10 shrink-0 overflow-hidden rounded-full" {...props}>{children}</div>
 }
 
-export const Avatar: React.FC<AvatarProps> = ({ src, alt, className, ...props }) => {
-  return (
-    <div
-      className={cn("h-10 w-10 rounded-full overflow-hidden bg-gray-200", className)}
-      {...props}
-    >
-      {src ? (
-        <img src={src} alt={alt} className="h-full w-full object-cover" />
-      ) : (
-        <span className="flex h-full w-full items-center justify-center text-gray-500">
-          ?
-        </span>
-      )}
-    </div>
-  );
-};
+export function AvatarImage(props: React.ImgHTMLAttributes<HTMLImageElement>) {
+  return <img className="aspect-square h-full w-full" {...props} />
+}
+
+export function AvatarFallback({ children, ...props }: React.HTMLAttributes<HTMLSpanElement>) {
+  return <span className="flex h-full w-full items-center justify-center rounded-full bg-muted" {...props}>{children}</span>
+}
