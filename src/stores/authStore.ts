@@ -43,6 +43,11 @@ export const useAuthStore = create<AuthState>()(
       signIn: async (email, password) => {
         set({ isLoading: true });
 
+        if (!supabase) {
+          set({ isLoading: false });
+          return { error: "Supabase is not configured. Please check your environment variables." };
+        }
+
         try {
           const { data, error } =
             await supabase.auth.signInWithPassword({
@@ -106,6 +111,11 @@ export const useAuthStore = create<AuthState>()(
       ) => {
         set({ isLoading: true });
 
+        if (!supabase) {
+          set({ isLoading: false });
+          return { error: "Supabase is not configured. Please check your environment variables." };
+        }
+
         try {
           const { data, error } = await supabase.auth.signUp({
             email,
@@ -166,6 +176,17 @@ export const useAuthStore = create<AuthState>()(
       // Sign out
       signOut: async () => {
         set({ isLoading: true });
+        
+        if (!supabase) {
+          set({
+            user: null,
+            profile: null,
+            isAuthenticated: false,
+            isLoading: false,
+          });
+          return;
+        }
+        
         try {
           await supabase.auth.signOut();
           set({
@@ -184,6 +205,10 @@ export const useAuthStore = create<AuthState>()(
       updateProfile: async (updates) => {
         const { user } = get();
         if (!user) return { error: "Not authenticated" };
+
+        if (!supabase) {
+          return { error: "Supabase is not configured. Please check your environment variables." };
+        }
 
         try {
           const { error } = await supabase
@@ -267,31 +292,33 @@ export const useAuthStore = create<AuthState>()(
 );
 
 // Supabase auth state listener
-supabase.auth.onAuthStateChange(async (event, session) => {
-  const { setUser, setProfile, setLoading } =
-    useAuthStore.getState();
+if (supabase) {
+  supabase.auth.onAuthStateChange(async (event, session) => {
+    const { setUser, setProfile, setLoading } =
+      useAuthStore.getState();
 
-  if (event === "SIGNED_IN" && session?.user) {
-    const { data: userData } = await supabase
-      .from("users")
-      .select("*")
-      .eq("id", session.user.id)
-      .single();
+    if (event === "SIGNED_IN" && session?.user) {
+      const { data: userData } = await supabase
+        .from("users")
+        .select("*")
+        .eq("id", session.user.id)
+        .single();
 
-    const { data: profileData } = await supabase
-      .from("profiles")
-      .select("*")
-      .eq("id", session.user.id)
-      .single();
+      const { data: profileData } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("id", session.user.id)
+        .single();
 
-    if (userData) {
-      setUser(userData);
-      setProfile(profileData);
+      if (userData) {
+        setUser(userData);
+        setProfile(profileData);
+      }
+    } else if (event === "SIGNED_OUT") {
+      setUser(null);
+      setProfile(null);
     }
-  } else if (event === "SIGNED_OUT") {
-    setUser(null);
-    setProfile(null);
-  }
 
-  setLoading(false);
-});
+    setLoading(false);
+  });
+}
