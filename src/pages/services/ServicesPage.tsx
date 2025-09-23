@@ -1,17 +1,22 @@
 // Services Page - Browse and Request Services
 // File: src/pages/services/ServicesPage.tsx
 
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { useAuth } from '../../hooks/useAuth'
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../../components/ui/Card'
+import {
+  Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle
+} from '../../components/ui/Card'
 import { Button } from '../../components/ui/Button'
 import { Badge } from '../../components/ui/Badge'
 import { Input } from '../../components/ui/Input'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../components/ui/Select'
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '../../components/ui/Dialog'
+import { Select } from '../../components/ui/Select'
+import {
+  Dialog, DialogContent, DialogDescription, DialogFooter,
+  DialogHeader, DialogTitle
+} from '../../components/ui/Dialog'
 import { Label } from '../../components/ui/Label'
 import { Textarea } from '../../components/ui/textarea'
-import { Search, Filter, ExternalLink, Clock, DollarSign, Tag } from 'lucide-react'
+import { Search, ExternalLink, Clock, DollarSign, Tag } from 'lucide-react'
 
 interface Service {
   id: string
@@ -37,7 +42,7 @@ interface ServiceCategory {
 }
 
 export default function ServicesPage() {
-  const { user, profile } = useAuth()
+  const { user, session } = useAuth() // ✅ now get session
   const [services, setServices] = useState<Service[]>([])
   const [categories, setCategories] = useState<ServiceCategory[]>([])
   const [loading, setLoading] = useState(true)
@@ -61,11 +66,14 @@ export default function ServicesPage() {
 
   const fetchServices = async () => {
     try {
-      const response = await fetch('/api/services' + (selectedCategory !== 'all' ? `?category=${selectedCategory}` : ''), {
-        headers: {
-          'Authorization': `Bearer ${user?.access_token}`,
-        },
-      })
+      const response = await fetch(
+        '/api/services' + (selectedCategory !== 'all' ? `?category=${selectedCategory}` : ''),
+        {
+          headers: {
+            'Authorization': `Bearer ${session?.access_token ?? ''}`, // ✅ fixed
+          },
+        }
+      )
 
       if (response.ok) {
         const data = await response.json()
@@ -82,7 +90,7 @@ export default function ServicesPage() {
     try {
       const response = await fetch('/api/service-categories', {
         headers: {
-          'Authorization': `Bearer ${user?.access_token}`,
+          'Authorization': `Bearer ${session?.access_token ?? ''}`, // ✅ fixed
         },
       })
 
@@ -116,7 +124,7 @@ export default function ServicesPage() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${user?.access_token}`,
+          'Authorization': `Bearer ${session?.access_token ?? ''}`, // ✅ fixed
         },
         body: JSON.stringify({
           service_id: selectedService.id,
@@ -198,21 +206,19 @@ export default function ServicesPage() {
               className="pl-10"
             />
           </div>
-          
-          <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-            <SelectTrigger className="w-full sm:w-48">
-              <Filter className="h-4 w-4 mr-2" />
-              <SelectValue placeholder="Kategori" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Tout kategori yo</SelectItem>
-              {categories.map(category => (
-                <SelectItem key={category.id} value={category.name}>
-                  {category.icon} {category.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+
+          <Select
+            label="Kategori"
+            value={selectedCategory}
+            onChange={(e) => setSelectedCategory(e.target.value)}
+            options={[
+              { value: 'all', label: 'Tout kategori yo' },
+              ...categories.map(cat => ({
+                value: cat.name,
+                label: `${cat.icon} ${cat.name}`,
+              }))
+            ]}
+          />
         </div>
 
         {/* Services Grid */}
@@ -235,12 +241,12 @@ export default function ServicesPage() {
                   </Badge>
                 </div>
               </CardHeader>
-              
+
               <CardContent>
                 <CardDescription className="text-sm mb-4 line-clamp-3">
                   {service.description}
                 </CardDescription>
-                
+
                 <div className="space-y-2 text-sm text-gray-600 dark:text-gray-300">
                   {service.price_range && (
                     <div className="flex items-center space-x-2">
@@ -248,7 +254,7 @@ export default function ServicesPage() {
                       <span>{service.price_range}</span>
                     </div>
                   )}
-                  
+
                   {service.creator && (
                     <div className="flex items-center space-x-2">
                       <Tag className="h-4 w-4" />
@@ -259,19 +265,15 @@ export default function ServicesPage() {
                   )}
                 </div>
               </CardContent>
-              
+
               <CardFooter className="space-x-2">
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  className="flex-1"
-                >
+                <Button variant="outline" size="sm" className="flex-1">
                   <ExternalLink className="h-4 w-4 mr-2" />
                   Detay yo
                 </Button>
-                
+
                 {user && service.status === 'active' && (
-                  <Button 
+                  <Button
                     size="sm"
                     className="flex-1"
                     onClick={() => handleRequestService(service)}
@@ -368,7 +370,7 @@ export default function ServicesPage() {
             <Button variant="outline" onClick={() => setRequestDialogOpen(false)}>
               Anile
             </Button>
-            <Button 
+            <Button
               onClick={submitServiceRequest}
               disabled={submitting || !requestForm.title || !requestForm.description}
             >

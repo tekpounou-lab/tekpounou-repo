@@ -1,9 +1,9 @@
 // File: src/hooks/useAuth.ts
 import { useCallback } from "react";
 import { useAuthStore } from "@/stores/authStore";
-import { useSupabaseClient } from '@supabase/auth-helpers-react';
-import type { User as SupabaseUser } from "@supabase/auth-js";
-import type { User } from "@/types"; // your custom type
+import { useSupabaseClient } from "@supabase/auth-helpers-react";
+import type { User as SupabaseUser, Session } from "@supabase/auth-js";
+import type { User } from "@/types"; // your custom app user type
 
 /**
  * Map Supabase user → App User
@@ -13,14 +13,15 @@ function mapSupabaseUser(user: SupabaseUser): User {
     id: user.id,
     email: user.email ?? "",
     role: (user.user_metadata?.role as string) || "user",
-    is_active: true, // default until you manage status in DB
-    ...user.user_metadata, // spread metadata if needed
+    is_active: true, // default until managed in DB
+    ...user.user_metadata, // include extra metadata if needed
   };
 }
 
 export function useAuth() {
   const supabase = useSupabaseClient();
-  const { user, isLoading, setUser, setLoading, clearUser } = useAuthStore();
+  const { user, session, isLoading, setUser, setSession, setLoading, clearUser } =
+    useAuthStore();
 
   /**
    * Sign in
@@ -35,18 +36,21 @@ export function useAuth() {
         });
 
         if (error) throw error;
-        if (data.user) {
+
+        if (data.user && data.session) {
           setUser(mapSupabaseUser(data.user));
+          setSession(data.session);
         }
+
         return { user: data.user, session: data.session };
       } catch (err) {
-        console.error("Error signing in:", err);
+        console.error("❌ Error signing in:", err);
         throw err;
       } finally {
         setLoading(false);
       }
     },
-    [supabase, setLoading, setUser]
+    [supabase, setLoading, setUser, setSession]
   );
 
   /**
@@ -65,18 +69,21 @@ export function useAuth() {
         });
 
         if (error) throw error;
-        if (data.user) {
+
+        if (data.user && data.session) {
           setUser(mapSupabaseUser(data.user));
+          setSession(data.session);
         }
+
         return { user: data.user, session: data.session };
       } catch (err) {
-        console.error("Error signing up:", err);
+        console.error("❌ Error signing up:", err);
         throw err;
       } finally {
         setLoading(false);
       }
     },
-    [supabase, setLoading, setUser]
+    [supabase, setLoading, setUser, setSession]
   );
 
   /**
@@ -89,7 +96,7 @@ export function useAuth() {
       if (error) throw error;
       clearUser();
     } catch (err) {
-      console.error("Error signing out:", err);
+      console.error("❌ Error signing out:", err);
       throw err;
     } finally {
       setLoading(false);
@@ -106,7 +113,7 @@ export function useAuth() {
         if (error) throw error;
         return data;
       } catch (err) {
-        console.error("Error requesting password reset:", err);
+        console.error("❌ Error requesting password reset:", err);
         throw err;
       }
     },
@@ -126,6 +133,7 @@ export function useAuth() {
 
   return {
     user,
+    session, // ✅ expose session (includes access_token)
     isLoading,
     signIn,
     signUp,
