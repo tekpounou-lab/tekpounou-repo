@@ -1,44 +1,17 @@
-// Landing Page - Tek Pou Nou
-// File: src/pages/LandingPage.tsx
+// src/pages/LandingPage.tsx
 
-import React from "react"
-import { Link } from "react-router-dom"
-import { Button } from "@/components/ui/Button"
-import { Card, CardContent } from "@/components/ui/Card"
-import { ArrowRight, Users, Briefcase, BookOpen } from "lucide-react"
+import React from "react";
+import { Link } from "react-router-dom";
+import { Button } from "@/components/ui/Button";
+import { Card, CardContent } from "@/components/ui/Card";
+import { ArrowRight, Users, Briefcase, BookOpen } from "lucide-react";
+import Navbar from "@/components/layout/Navbar";
 
 export default function LandingPage() {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col">
-      {/* Hero Section */}
-      <header className="bg-white dark:bg-gray-800 shadow">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-          <h1 className="text-xl font-bold text-gray-900 dark:text-white">
-            Tek Pou Nou
-          </h1>
-          <nav className="space-x-4">
-            <Link to="/about" className="text-gray-600 dark:text-gray-300 hover:text-gray-900">
-              Sou nou
-            </Link>
-            <Link to="/services" className="text-gray-600 dark:text-gray-300 hover:text-gray-900">
-              Sèvis
-            </Link>
-            <Link to="/contact" className="text-gray-600 dark:text-gray-300 hover:text-gray-900">
-              Kontak
-            </Link>
-          </nav>
-          <div className="space-x-2">
-            <Link to="/auth">
-              <Button size="sm">Konekte</Button>
-            </Link>
-            <Link to="/auth">
-              <Button size="sm" variant="outline">
-                Kreye kont
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </header>
+      {/* ✅ Use shared Navbar */}
+      <Navbar />
 
       {/* Hero Content */}
       <main className="flex-1 flex items-center justify-center px-6 py-16">
@@ -52,7 +25,7 @@ export default function LandingPage() {
             nan yon kominote solid.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link to="/auth">
+            <Link to="/auth/register">
               <Button size="lg" className="flex items-center gap-2">
                 Kòmanse Kounya <ArrowRight className="h-5 w-5" />
               </Button>
@@ -110,5 +83,5 @@ export default function LandingPage() {
         </div>
       </footer>
     </div>
-  )
+  );
 }

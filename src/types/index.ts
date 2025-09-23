@@ -1,6 +1,6 @@
 // Base types for the application
 
-export type UserRole = 'super_admin' | 'admin' | 'teacher' | 'student' | 'guest';
+export type UserRole = 'super_admin' | 'admin' | 'teacher' | 'student' | 'guest' | 'sme_client';
 export type LanguageCode = 'ht-HT' | 'en-US' | 'fr-FR';
 export type ApplicationStatus = 'pending' | 'approved' | 'rejected';
 

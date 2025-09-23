@@ -23,6 +23,9 @@ import { useReferralTracking } from "./components/marketing/ReferralSystem";
 import { analytics, useAnalytics } from "./lib/analytics";
 import { supabase } from "./lib/supabase";
 
+// Navigation config
+import { mainNavigation } from "@/config/navigation";
+
 // Pages
 import HomePage from "./pages/HomePage";
 import CoursesPage from "./pages/CoursesPage";
@@ -39,11 +42,10 @@ import LandingPage from "./pages/LandingPage";
 import NewsletterUnsubscribePage from "./pages/NewsletterUnsubscribePage";
 import NotFoundPage from "./pages/NotFoundPage";
 
-// Auth Pages (separated instead of passing type props)
-import LoginPage from "./components/auth/LoginPage";
-import RegisterPage from "./components/auth/RegisterPage";
+// Auth
+import AuthPage from "./pages/AuthPage";
 
-// Admin Components
+// Admin
 import AdminLayout from "./components/admin/AdminLayout";
 import { MarketingDashboard } from "./components/admin/MarketingDashboard";
 import { LandingPageBuilder } from "./components/admin/LandingPageBuilder";
@@ -62,7 +64,7 @@ const queryClient = new QueryClient({
   },
 });
 
-// Analytics initialization component
+// ---------------------- Analytics Init ----------------------
 function AnalyticsInit() {
   const location = useLocation();
   const { trackPageView } = useAnalytics();
@@ -83,27 +85,79 @@ function AnalyticsInit() {
   return null;
 }
 
-// SEO manager
+// ---------------------- SEO Manager ----------------------
 function SEOManager() {
   const location = useLocation();
 
   const getSEOForRoute = (pathname: string) => {
     if (pathname === "/") return defaultSEOConfigs.home;
+
+    // Dynamic course detail
+    if (pathname.startsWith("/courses/") && pathname.split("/").length === 3) {
+      return {
+        ...defaultSEOConfigs.courses,
+        title: "Course Detail | Tek Pou Nou",
+        description:
+          "Aprann plis sou kou sa a sou teknoloji, antreprenarya ak plis ankò.",
+      };
+    }
     if (pathname.startsWith("/courses")) return defaultSEOConfigs.courses;
+
+    // Dynamic blog post
+    if (pathname.startsWith("/blog/") && pathname.split("/").length === 3) {
+      return {
+        ...defaultSEOConfigs.blog,
+        title: "Blog Post | Tek Pou Nou",
+        description:
+          "Li atik sa a sou teknoloji, inovasyon ak antreprenarya ann Ayiti.",
+      };
+    }
     if (pathname.startsWith("/blog")) return defaultSEOConfigs.blog;
+
+    // Dynamic service detail
+    if (pathname.startsWith("/services/") && pathname.split("/").length === 3) {
+      return {
+        ...defaultSEOConfigs.services,
+        title: "Service Detail | Tek Pou Nou",
+        description: "Aprann plis sou sèvis sa a pou devlopman biznis ou.",
+      };
+    }
     if (pathname.startsWith("/services")) return defaultSEOConfigs.services;
+
+    if (pathname === "/pricing") return defaultSEOConfigs.pricing;
     if (pathname === "/about") return defaultSEOConfigs.about;
+    if (pathname === "/contact") return defaultSEOConfigs.contact;
+    if (pathname.startsWith("/events")) return defaultSEOConfigs.events;
+    if (pathname.startsWith("/news")) return defaultSEOConfigs.news;
+
+    // fallback: match a nav item
+    const navMatch = mainNavigation.find((item) =>
+      pathname.startsWith(item.href)
+    );
+    if (navMatch) {
+      return {
+        title: `${navMatch.name} | Tek Pou Nou`,
+        description: `Discover more about ${navMatch.name} on Tek Pou Nou.`,
+      };
+    }
+
     return null;
   };
 
   const seoConfig = getSEOForRoute(location.pathname);
   if (!seoConfig) return null;
 
-  return <SEOHead {...seoConfig} />;
+  return (
+    <SEOHead
+      {...seoConfig}
+      locale="ht"
+      image="https://tekpounou.com/og-image.png"
+    />
+  );
 }
 
+// ---------------------- App ----------------------
 function App() {
-  // Initialize referral tracking
   useReferralTracking();
 
   return (
@@ -112,16 +166,14 @@ function App() {
         <AuthProvider>
           <Router>
             <div className="min-h-screen bg-gray-50">
-              {/* Global SEO */}
               <SEOManager />
-
-              {/* Analytics */}
               <AnalyticsInit />
 
-              {/* Routes */}
               <Routes>
-                {/* Public Routes */}
+                {/* Public Home */}
                 <Route path="/" element={<HomePage />} />
+
+                {/* Public Routes */}
                 <Route path="/courses" element={<CoursesPage />} />
                 <Route path="/courses/:id" element={<CourseDetailPage />} />
                 <Route path="/blog" element={<BlogPage />} />
@@ -132,12 +184,17 @@ function App() {
                 <Route path="/contact" element={<ContactPage />} />
                 <Route path="/pricing" element={<PricingPage />} />
 
-                {/* Auth Routes (separate pages) */}
-                <Route path="/auth/login" element={<LoginPage />} />
-                <Route path="/auth/register" element={<RegisterPage />} />
-                {/* Add ResetPasswordPage later if needed */}
+                {/* Auth */}
+                <Route
+                  path="/auth/login"
+                  element={<AuthPage defaultTab="login" />}
+                />
+                <Route
+                  path="/auth/register"
+                  element={<AuthPage defaultTab="register" />}
+                />
 
-                {/* Landing Pages */}
+                {/* Marketing Landing Pages */}
                 <Route path="/landing/:slug" element={<LandingPage />} />
 
                 {/* Newsletter */}
@@ -146,7 +203,7 @@ function App() {
                   element={<NewsletterUnsubscribePage />}
                 />
 
-                {/* User Dashboard (protected) */}
+                {/* Dashboard (protected) */}
                 <Route
                   path="/dashboard/*"
                   element={
@@ -156,7 +213,7 @@ function App() {
                   }
                 />
 
-                {/* Admin Routes (protected) */}
+                {/* Admin (protected) */}
                 <Route
                   path="/admin/*"
                   element={
@@ -167,24 +224,16 @@ function App() {
                 >
                   <Route path="marketing" element={<MarketingDashboard />} />
                   <Route path="landing-pages" element={<LandingPageBuilder />} />
-                  <Route
-                    path="landing-pages/new"
-                    element={<LandingPageBuilder />}
-                  />
-                  <Route
-                    path="landing-pages/:id"
-                    element={<LandingPageBuilder />}
-                  />
+                  <Route path="landing-pages/new" element={<LandingPageBuilder />} />
+                  <Route path="landing-pages/:id" element={<LandingPageBuilder />} />
                 </Route>
 
                 {/* 404 */}
                 <Route path="*" element={<NotFoundPage />} />
               </Routes>
 
-              {/* Global Components */}
               <FloatingNewsletterPopup />
 
-              {/* Toast Notifications */}
               <Toaster
                 position="top-right"
                 toastOptions={{
@@ -201,7 +250,6 @@ function App() {
             </div>
           </Router>
 
-          {/* Dev Tools */}
           {(import.meta as any).env.DEV && (
             <ReactQueryDevtools initialIsOpen={false} />
           )}
