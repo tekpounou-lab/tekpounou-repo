@@ -1,0 +1,18 @@
+{
+    "tasks": {
+      "dev": "deno run --allow-env --allow-net --watch index.ts"
+    },
+    "compilerOptions": {
+      "lib": ["deno.ns", "dom", "es2021"]
+    },
+    "lint": {
+      "rules": {
+        "tags": ["recommended"]
+      }
+    },
+    "fmt": {
+      "useTabs": false,
+      "lineWidth": 80,
+      "indentWidth": 2
+    }
+  }

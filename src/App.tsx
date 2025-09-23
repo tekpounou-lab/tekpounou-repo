@@ -15,43 +15,42 @@ import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import AuthProvider from "@/components/providers/AuthProvider";
 
 // Components
-import { SEOHead, defaultSEOConfigs } from "./components/common/SEOHead";
-import { FloatingNewsletterPopup } from "./components/marketing/NewsletterSignup";
-import { useReferralTracking } from "./components/marketing/ReferralSystem";
+import { SEOHead, defaultSEOConfigs } from "@/components/common/SEOHead";
+import { FloatingNewsletterPopup } from "@/components/marketing/NewsletterSignup";
+import { useReferralTracking } from "@/components/marketing/ReferralSystem";
 
 // Analytics
-import { analytics, useAnalytics } from "./lib/analytics";
-import { supabase } from "./lib/supabase";
+import { analytics, useAnalytics } from "@/lib/analytics";
+import { supabase } from "@/lib/supabase";
 
 // Navigation config
 import { mainNavigation } from "@/config/navigation";
 
 // Pages
-import HomePage from "./pages/HomePage";
-import CoursesPage from "./pages/CoursesPage";
-import CourseDetailPage from "./pages/courses/CourseDetailPage";
-import BlogPage from "./pages/BlogPage";
-import BlogPostPage from "./pages/blog/BlogPostPage";
-import ServicesPage from "./pages/ServicesPage";
-import ServiceDetailPage from "./pages/services/ServiceDetailPage";
-import AboutPage from "./pages/AboutPage";
-import ContactPage from "./pages/ContactPage";
-import PricingPage from "./pages/pricing/PricingPage";
-import DashboardPage from "./pages/DashboardPage";
-import LandingPage from "./pages/LandingPage";
-import NewsletterUnsubscribePage from "./pages/NewsletterUnsubscribePage";
-import NotFoundPage from "./pages/NotFoundPage";
+import RootPage from "@/pages/RootPage";
+import CoursesPage from "@/pages/courses/CoursesPage";
+import CourseDetailPage from "@/pages/courses/CourseDetailPage";
+import BlogPage from "@/pages/blog/BlogPage";
+import BlogPostPage from "@/pages/blog/BlogPostPage";
+import ServicesPage from "@/pages/services/ServicesPage";
+import ServiceDetailPage from "@/pages/services/ServiceDetailPage";
+import AboutPage from "@/pages/AboutPage";
+import ContactPage from "@/pages/ContactPage";
+import PricingPage from "@/pages/pricing/PricingPage";
+import LandingPage from "@/pages/LandingPage";
+import NewsletterUnsubscribePage from "@/pages/NewsletterUnsubscribePage";
+import NotFoundPage from "@/pages/NotFoundPage";
 
 // Auth
-import AuthPage from "./pages/AuthPage";
+import AuthPage from "@/pages/AuthPage";
 
 // Admin
-import AdminLayout from "./components/admin/AdminLayout";
-import { MarketingDashboard } from "./components/admin/MarketingDashboard";
-import { LandingPageBuilder } from "./components/admin/LandingPageBuilder";
+import AdminLayout from "@/components/admin/AdminLayout";
+import { MarketingDashboard } from "@/components/admin/MarketingDashboard";
+import { LandingPageBuilder } from "@/components/admin/LandingPageBuilder";
 
 // Auth Guard
-import RouteGuard from "./components/auth/RouteGuard";
+import RouteGuard from "@/components/auth/RouteGuard";
 
 // Styles
 import "./index.css";
@@ -170,8 +169,8 @@ function App() {
               <AnalyticsInit />
 
               <Routes>
-                {/* Public Home */}
-                <Route path="/" element={<HomePage />} />
+                {/* Root route: switches between HomePage, LandingPage, Dashboard */}
+                <Route path="/" element={<RootPage />} />
 
                 {/* Public Routes */}
                 <Route path="/courses" element={<CoursesPage />} />
@@ -208,7 +207,10 @@ function App() {
                   path="/dashboard/*"
                   element={
                     <RouteGuard>
-                      <DashboardPage />
+                      <div className="min-h-screen">
+                        {/* Dashboard wrapper */}
+                        <RootPage /> {/* 👈 handles logged-in Dashboard */}
+                      </div>
                     </RouteGuard>
                   }
                 />
